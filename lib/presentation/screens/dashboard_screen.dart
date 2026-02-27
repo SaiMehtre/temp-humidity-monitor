@@ -4,6 +4,7 @@ import '../../presentation/providers/dashboard_provider.dart';
 import '../widgets/sensor_card.dart';
 import '../widgets/status_indicator.dart';
 import 'package:intl/intl.dart';
+import '../providers/threshold_provider.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -11,6 +12,15 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final data = ref.watch(dashboardProvider);
+    final threshold = ref.watch(thresholdProvider);
+
+    final bool tempAlert = threshold.tempEnabled &&
+    (data.temperature < threshold.tempMin ||
+        data.temperature > threshold.tempMax);
+
+    final bool humidityAlert = threshold.humidityEnabled &&
+        (data.humidity < threshold.humidityMin ||
+            data.humidity > threshold.humidityMax);
 
     return Scaffold(
       appBar: AppBar(
@@ -40,20 +50,20 @@ class DashboardScreen extends ConsumerWidget {
                             Expanded(
                               child: SensorCard(
                                 title: "Temperature",
-                                value:
-                                    "${data.temperature.toStringAsFixed(1)} °C",
+                                value: "${data.temperature.toStringAsFixed(1)} °C",
                                 icon: Icons.thermostat,
-                                color: Colors.orange,
+                                color: tempAlert ? Colors.red : Colors.orange,
+                                isAlert: tempAlert,
                               ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: SensorCard(
                                 title: "Humidity",
-                                value:
-                                    "${data.humidity.toStringAsFixed(1)} %",
+                                value: "${data.humidity.toStringAsFixed(1)} %",
                                 icon: Icons.water_drop,
-                                color: Colors.blue,
+                                color: humidityAlert ? Colors.red : Colors.blue,
+                                isAlert: humidityAlert,
                               ),
                             ),
                           ],
@@ -62,18 +72,18 @@ class DashboardScreen extends ConsumerWidget {
                           children: [
                             SensorCard(
                               title: "Temperature",
-                              value:
-                                  "${data.temperature.toStringAsFixed(1)} °C",
+                              value: "${data.temperature.toStringAsFixed(1)} °C",
                               icon: Icons.thermostat,
-                              color: Colors.orange,
+                              color: tempAlert ? Colors.red : Colors.orange,
+                              isAlert: tempAlert,
                             ),
                             const SizedBox(height: 16),
                             SensorCard(
                               title: "Humidity",
-                              value:
-                                  "${data.humidity.toStringAsFixed(1)} %",
+                              value: "${data.humidity.toStringAsFixed(1)} %",
                               icon: Icons.water_drop,
-                              color: Colors.blue,
+                              color: humidityAlert ? Colors.red : Colors.blue,
+                              isAlert: humidityAlert,
                             ),
                           ],
                         ),

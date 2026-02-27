@@ -6,6 +6,7 @@ class SensorCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final bool isAlert;
 
   const SensorCard({
     super.key,
@@ -13,11 +14,21 @@ class SensorCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.color,
+    this.isAlert = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: isAlert
+          ? Colors.red.withOpacity(0.08)
+          : Theme.of(context).cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: isAlert
+            ? const BorderSide(color: Colors.red, width: 1)
+            : BorderSide.none,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Row(
