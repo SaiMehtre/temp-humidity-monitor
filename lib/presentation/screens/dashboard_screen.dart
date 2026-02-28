@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../providers/threshold_provider.dart';
 import '../../data/models/alert_type.dart';
 import '../../data/services/alert_service.dart';
+import '../../data/services/notification_service.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -19,207 +20,130 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState
     extends ConsumerState<DashboardScreen> {
 
-      // AlertType _previousTempAlert = AlertType.normal;
-      // AlertType _previousHumidityAlert = AlertType.normal;
+  bool _isAlertActive = false;
 
   @override
   void initState() {
     super.initState();
 
-    // ref.listen(dashboardProvider, (previous, next) {
-    //   final threshold = ref.read(thresholdProvider);
+    // 🔥 IMPORTANT: microtask lagao to avoid ref error
+    Future.microtask(() {
+      ref.listen(dashboardProvider, (previous, next) {
+        final threshold = ref.read(thresholdProvider);
 
-    //   AlertType getTempAlert() {
-    //     if (!threshold.tempEnabled) return AlertType.normal;
+        final isTempDanger =
+            threshold.tempEnabled &&
+            next.temperature >= threshold.tempMax;
 
-    //     if (next.temperature < threshold.tempMin) {
-    //       return AlertType.low;
-    //     } else if (next.temperature > threshold.tempMax) {
-    //       return AlertType.high;
-    //     } else {
-    //       return AlertType.normal;
-    //     }
-    //   }
+        final isHumidityDanger =
+            threshold.humidityEnabled &&
+            next.humidity >= threshold.humidityMax;
 
-    //   AlertType getHumidityAlert() {
-    //     if (!threshold.humidityEnabled) return AlertType.normal;
+        final isDanger = isTempDanger || isHumidityDanger;
 
-    //     if (next.humidity < threshold.humidityMin) {
-    //       return AlertType.low;
-    //     } else if (next.humidity > threshold.humidityMax) {
-    //       return AlertType.high;
-    //     } else {
-    //       return AlertType.normal;
-    //     }
-    //   }
+        if (isDanger && !_isAlertActive) {
+          _isAlertActive = true;
 
-    //   final currentTempAlert = getTempAlert();
-    //   final currentHumidityAlert = getHumidityAlert();
+          AlertService.startAlert();
 
-    //   // 🚨 Trigger only when state changes from normal → alert
-    //   if ((_previousTempAlert == AlertType.normal &&
-    //           currentTempAlert != AlertType.normal) ||
-    //       (_previousHumidityAlert == AlertType.normal &&
-    //           currentHumidityAlert != AlertType.normal)) {
-    //     AlertService.triggerAlert();
-    //   }
+          NotificationService.showAlert(
+            " Alert!",
+            "Temp: ${next.temperature}°C  Humidity: ${next.humidity}%",
+          );
+        }
 
-    //   _previousTempAlert = currentTempAlert;
-    //   _previousHumidityAlert = currentHumidityAlert;
-    // });
+        if (!isDanger && _isAlertActive) {
+          _isAlertActive = false;
+          AlertService.stopAlert();
+        }
+
+        print("TEMP: ${next.temperature}");
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    ref.listen(dashboardProvider, (previous, next) {
-  final threshold = ref.read(thresholdProvider);
-
-  AlertType getTempAlert(double temp) {
-    if (!threshold.tempEnabled) return AlertType.normal;
-
-    if (temp < threshold.tempMin) return AlertType.low;
-    if (temp > threshold.tempMax) return AlertType.high;
-    return AlertType.normal;
-  }
-
-  AlertType getHumidityAlert(double humidity) {
-    if (!threshold.humidityEnabled) return AlertType.normal;
-
-    if (humidity < threshold.humidityMin) return AlertType.low;
-    if (humidity > threshold.humidityMax) return AlertType.high;
-    return AlertType.normal;
-  }
-
-  final prevTemp = previous != null
-      ? getTempAlert(previous.temperature)
-      : AlertType.normal;
-
-  final currentTemp = getTempAlert(next.temperature);
-
-  final prevHumidity = previous != null
-      ? getHumidityAlert(previous.humidity)
-      : AlertType.normal;
-
-  final currentHumidity = getHumidityAlert(next.humidity);
-
-  if ((prevTemp == AlertType.normal &&
-          currentTemp != AlertType.normal) ||
-      (prevHumidity == AlertType.normal &&
-          currentHumidity != AlertType.normal)) {
-    AlertService.triggerAlert();
-  }
-});
     final data = ref.watch(dashboardProvider);
     final threshold = ref.watch(thresholdProvider);
 
     AlertType getTempAlert() {
-    if (!threshold.tempEnabled) return AlertType.normal;
+      if (!threshold.tempEnabled) return AlertType.normal;
 
-    if (data.temperature < threshold.tempMin) {
-      return AlertType.low;
-    } else if (data.temperature > threshold.tempMax) {
-      return AlertType.high;
-    } else {
-      return AlertType.normal;
+      if (data.temperature < threshold.tempMin) {
+        return AlertType.low;
+      } else if (data.temperature > threshold.tempMax) {
+        return AlertType.high;
+      } else {
+        return AlertType.normal;
+      }
     }
-  }
 
-  AlertType getHumidityAlert() {
-    if (!threshold.humidityEnabled) return AlertType.normal;
+    AlertType getHumidityAlert() {
+      if (!threshold.humidityEnabled) return AlertType.normal;
 
-    if (data.humidity < threshold.humidityMin) {
-      return AlertType.low;
-    } else if (data.humidity > threshold.humidityMax) {
-      return AlertType.high;
-    } else {
-      return AlertType.normal;
+      if (data.humidity < threshold.humidityMin) {
+        return AlertType.low;
+      } else if (data.humidity > threshold.humidityMax) {
+        return AlertType.high;
+      } else {
+        return AlertType.normal;
+      }
     }
-  }
 
-  final tempAlertType = getTempAlert();
-  final humidityAlertType = getHumidityAlert();
+    final tempAlertType = getTempAlert();
+    final humidityAlertType = getHumidityAlert();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dashboard"),
         centerTitle: true,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isLargeScreen = constraints.maxWidth > 600;
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.read(dashboardProvider.notifier).refreshData();
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StatusIndicator(isOnline: data.isOnline),
-                  const SizedBox(height: 20),
-
-                  isLargeScreen
-                      ? Row(
-                          children: [
-                            Expanded(
-                              child: SensorCard(
-                                title: "Temperature",
-                                value: "${data.temperature.toStringAsFixed(1)} °C",
-                                icon: Icons.thermostat,
-                                alertType: tempAlertType,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: SensorCard(
-                                title: "Humidity",
-                                value: "${data.humidity.toStringAsFixed(1)} %",
-                                icon: Icons.water_drop,
-                                alertType: humidityAlertType,
-                              ),
-                            ),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            SensorCard(
-                              title: "Temperature",
-                              value: "${data.temperature.toStringAsFixed(1)} °C",
-                              icon: Icons.thermostat,
-                              alertType: tempAlertType,
-                            ),
-                            const SizedBox(height: 16),
-                            SensorCard(
-                              title: "Humidity",
-                              value: "${data.humidity.toStringAsFixed(1)} %",
-                              icon: Icons.water_drop,
-                              alertType: humidityAlertType,
-                            ),
-                          ],
-                        ),
-
-                  const SizedBox(height: 24),
-
-                  Text(
-                    "Last Updated: ${DateFormat('dd MMM yyyy, hh:mm a').format(data.lastUpdated)}",
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-
-//                   ElevatedButton(
-//   onPressed: () {
-//     AlertService.triggerAlert();
-//   },
-//   child: Text("Test Sound"),
-// )
-                ],
-              ),
-            ),
-          );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.read(dashboardProvider.notifier).refreshData();
         },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              StatusIndicator(isOnline: data.isOnline),
+              const SizedBox(height: 20),
+
+              SensorCard(
+                title: "Temperature",
+                value: "${data.temperature.toStringAsFixed(1)} °C",
+                icon: Icons.thermostat,
+                alertType: tempAlertType,
+              ),
+
+              const SizedBox(height: 16),
+
+              SensorCard(
+                title: "Humidity",
+                value: "${data.humidity.toStringAsFixed(1)} %",
+                icon: Icons.water_drop,
+                alertType: humidityAlertType,
+              ),
+
+              const SizedBox(height: 24),
+
+              Text(
+                "Last Updated: ${DateFormat('dd MMM yyyy, hh:mm a').format(data.lastUpdated)}",
+              ),
+
+              const SizedBox(height: 20),
+
+              ElevatedButton(
+                onPressed: () {
+                  AlertService.startAlert();
+                },
+                child: const Text("Test Sound"),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

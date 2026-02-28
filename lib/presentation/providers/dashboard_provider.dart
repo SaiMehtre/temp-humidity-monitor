@@ -8,7 +8,9 @@ final dashboardProvider =
 });
 
 class DashboardNotifier extends StateNotifier<SensorData> {
-  DashboardNotifier() : super(MockSensorData.getData());
+  DashboardNotifier() : super(MockSensorData.getData()) {
+    Future.microtask(() => refreshData());
+  }
 
   void refreshData() {
     state = MockSensorData.getData();
