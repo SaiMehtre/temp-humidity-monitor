@@ -5,6 +5,20 @@ class AlertService {
 
   static bool _isPlaying = false;
   static DateTime? _snoozeUntil;
+  static DateTime? tempSnoozeUntil;
+  static DateTime? humiditySnoozeUntil;
+
+  static void snoozeTemp(int minutes) {
+    tempSnoozeUntil =
+        DateTime.now().add(Duration(minutes: minutes));
+    stopAlert();
+  }
+
+  static void snoozeHumidity(int minutes) {
+    humiditySnoozeUntil =
+        DateTime.now().add(Duration(minutes: minutes));
+    stopAlert();
+  }
 
   static Future<void> startAlert() async {
     if (_isPlaying) return;

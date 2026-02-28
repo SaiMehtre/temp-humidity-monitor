@@ -8,6 +8,9 @@ import '../providers/threshold_provider.dart';
 import '../../data/models/alert_type.dart';
 import '../../data/services/alert_service.dart';
 import '../../data/services/notification_service.dart';
+import '../../presentation/providers/interval_provider.dart';
+import '../../presentation/providers/alert_history_provider.dart';
+import '../../data/models/alert_history.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -20,47 +23,79 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState
     extends ConsumerState<DashboardScreen> {
 
-  bool _isAlertActive = false;
+  // bool _isAlertActive = false;
 
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
 
-    // 🔥 IMPORTANT: microtask lagao to avoid ref error
-    Future.microtask(() {
-      ref.listen(dashboardProvider, (previous, next) {
-        final threshold = ref.read(thresholdProvider);
+  Future.microtask(() {
+    ref.listen(dashboardProvider, (previous, next) {
+      final threshold = ref.read(thresholdProvider);
 
-        final isTempDanger =
-            threshold.tempEnabled &&
-            next.temperature >= threshold.tempMax;
+      final isTempDanger =
+          threshold.tempEnabled &&
+          next.temperature >= threshold.tempMax;
 
-        final isHumidityDanger =
-            threshold.humidityEnabled &&
-            next.humidity >= threshold.humidityMax;
+      final isHumidityDanger =
+          threshold.humidityEnabled &&
+          next.humidity >= threshold.humidityMax;
 
-        final isDanger = isTempDanger || isHumidityDanger;
+      final now = DateTime.now();
 
-        if (isDanger && !_isAlertActive) {
-          _isAlertActive = true;
+      final tempSnoozed =
+          AlertService.tempSnoozeUntil != null &&
+          now.isBefore(AlertService.tempSnoozeUntil!);
 
-          AlertService.startAlert();
+      final humiditySnoozed =
+          AlertService.humiditySnoozeUntil != null &&
+          now.isBefore(AlertService.humiditySnoozeUntil!);
 
-          NotificationService.showAlert(
-            " Alert!",
-            "Temp: ${next.temperature}°C  Humidity: ${next.humidity}%",
-          );
-        }
+      bool triggered = false;
 
-        if (!isDanger && _isAlertActive) {
-          _isAlertActive = false;
-          AlertService.stopAlert();
-        }
+      // 🔥 TEMPERATURE ALERT
+      if (isTempDanger && !tempSnoozed) {
+        triggered = true;
 
-        print("TEMP: ${next.temperature}");
-      });
+        AlertService.startAlert();
+
+        NotificationService.showAlert(
+          "Temperature Alert",
+          "Temp: ${next.temperature}°C",
+        );
+
+        ref.read(alertHistoryProvider.notifier).update((state) => [
+              ...state,
+              AlertHistory("Temperature", next.temperature, now)
+            ]);
+      }
+
+      // 🔥 HUMIDITY ALERT
+      if (isHumidityDanger && !humiditySnoozed) {
+        triggered = true;
+
+        AlertService.startAlert();
+
+        NotificationService.showAlert(
+          "Humidity Alert",
+          "Humidity: ${next.humidity}%",
+        );
+
+        ref.read(alertHistoryProvider.notifier).update((state) => [
+              ...state,
+              AlertHistory("Humidity", next.humidity, now)
+            ]);
+      }
+
+      // 🔕 Stop if no danger
+      if (!isTempDanger && !isHumidityDanger) {
+        AlertService.stopAlert();
+      }
+
+      print("TEMP: ${next.temperature}");
     });
-  }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +168,19 @@ class _DashboardScreenState
                 "Last Updated: ${DateFormat('dd MMM yyyy, hh:mm a').format(data.lastUpdated)}",
               ),
 
+              const SizedBox(height: 20),
+              DropdownButton<int>(
+                value: ref.watch(intervalProvider),
+                items: const [
+                  DropdownMenuItem(value: 30, child: Text("30 Seconds")),
+                  DropdownMenuItem(value: 60, child: Text("1 Minute")),
+                  DropdownMenuItem(value: 300, child: Text("5 Minutes")),
+                ],
+                onChanged: (value) {
+                  ref.read(intervalProvider.notifier).state = value!;
+                  ref.read(dashboardProvider.notifier).refreshData();
+                },
+              ),
               const SizedBox(height: 20),
 
               ElevatedButton(
