@@ -141,6 +141,14 @@ class _DashboardScreenState
                 },
                 child: const Text("Test Sound"),
               ),
+
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  AlertService.snooze(5);
+                },
+                child: const Text("Snooze 5 Min"),
+              ),
             ],
           ),
         ),
