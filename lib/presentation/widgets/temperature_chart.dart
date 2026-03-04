@@ -10,10 +10,10 @@ class TemperatureChart extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final data = ref.watch(temperatureHistoryProvider);
 
-    if (data.isEmpty) {
+    if (data.length < 2) {
       return const SizedBox(
-        height: 200,
-        child: Center(child: Text("No data yet")),
+        height: 250,
+        child: Center(child: Text("Collecting data...")),
       );
     }
 
@@ -22,8 +22,10 @@ class TemperatureChart extends ConsumerWidget {
       height: 250,
       child: LineChart(
         LineChartData(
+          minY: 0,
+          maxY: 100, // IoT temp range ke hisab se set karo
           gridData: FlGridData(show: true),
-          titlesData: FlTitlesData(show: false),
+          titlesData: FlTitlesData(show: true),
           borderData: FlBorderData(show: true),
           lineBarsData: [
             LineChartBarData(
@@ -32,12 +34,12 @@ class TemperatureChart extends ConsumerWidget {
                 (index) => FlSpot(index.toDouble(), data[index]),
               ),
               isCurved: true,
-              dotData: FlDotData(show: false),
+              dotData: FlDotData(show: true), // 🔥 dots visible karo
               barWidth: 3,
             ),
-          ],
+          ],          
         ),
-      ),
+      )
     );
   }
 }

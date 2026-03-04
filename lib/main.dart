@@ -7,7 +7,7 @@ import 'data/services/notification_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../data/models/alert_history.dart';
 // import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-// import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -10,10 +10,10 @@ class ThresholdNotifier extends StateNotifier<ThresholdSettings> {
   ThresholdNotifier()
       : super(
           ThresholdSettings(
-            tempMin: 18,
-            tempMax: 35,
+            tempMin: 5,
+            tempMax: 80,
             tempEnabled: true,
-            humidityMin: 30,
+            humidityMin: 50,
             humidityMax: 70,
             humidityEnabled: true,
           ),

@@ -1,8 +1,8 @@
 import '../models/sensor_data.dart';
 
 class MockSensorData {
-  static double _temperature = 25;
-  static double _humidity = 30;
+  static double _temperature = 18;
+  static double _humidity = 50;
 
   static bool _increasing = true;
 
@@ -18,7 +18,7 @@ class MockSensorData {
       _temperature -= 5;
       _humidity -= 5;
 
-      if (_temperature <= 25) {
+      if (_temperature <= 18) {
         _increasing = true;
       }
     }
