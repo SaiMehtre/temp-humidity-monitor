@@ -5,6 +5,7 @@ import 'presentation/screens/home_screen.dart';
 import 'presentation/providers/theme_provider.dart';
 import 'data/services/notification_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../data/models/alert_history.dart';
 // import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 // import 'package:flutter/foundation.dart';
 
@@ -12,6 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
+  Hive.registerAdapter(AlertHistoryAdapter());
   await Hive.openBox('alerts');
 
   await NotificationService.init(); // IMPORTANT

@@ -17,6 +17,7 @@ class TemperatureChart extends ConsumerWidget {
       );
     }
 
+              print("Chart Data Length: ${data.length}");
     return SizedBox(
       height: 250,
       child: LineChart(

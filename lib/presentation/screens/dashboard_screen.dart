@@ -11,8 +11,10 @@ import '../../data/services/notification_service.dart';
 import '../../presentation/providers/interval_provider.dart';
 import '../../presentation/providers/alert_history_provider.dart';
 import '../../data/models/alert_history.dart';
-import '../../presentation/providers/temp_history_provider.dart';
+// import '../../presentation/providers/temp_history_provider.dart';
 import '../widgets/temperature_chart.dart';
+
+import 'package:hive_flutter/hive_flutter.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -60,10 +62,18 @@ void initState() {
         "Temp: ${next.temperature}°C",
       );
 
+      print("Temp added to graph: ${next.temperature}");
+
+      final box = Hive.box('alerts');
+
+      final alert = AlertHistory("Temperature", next.temperature, now);
+
+      box.add(alert); // 🔥 database save
+
       ref.read(alertHistoryProvider.notifier).update((state) => [
-            ...state,
-            AlertHistory("Temperature", next.temperature, now)
-          ]);
+        ...state,
+        alert
+      ]);
     }
 
     if (!isTempDanger) {
@@ -93,11 +103,11 @@ void initState() {
       AlertService.stopAlert();
     }
 
-    ref.read(temperatureHistoryProvider.notifier).update((state) {
-      final updated = [...state, next.temperature];
-      if (updated.length > 20) updated.removeAt(0);
-      return updated;
-    });
+    // ref.read(temperatureHistoryProvider.notifier).update((state) {
+    //   final updated = [...state, next.temperature];
+    //   if (updated.length > 20) updated.removeAt(0);
+    //   return updated;
+    // });
   });
 }
 
@@ -208,6 +218,24 @@ void initState() {
                 },
                 child: const Text("Snooze 5 Min"),
               ),
+
+              const SizedBox(height: 20),
+
+              ElevatedButton(
+                onPressed: () {
+                  AlertService.stopAlert();
+                },
+                child: const Text("Stop Alert"),
+              ),
+
+              // if lert is active then only show stop button 
+              // if (_isTempAlertActive || _isHumidityAlertActive)
+              // ElevatedButton(
+              //   onPressed: () {
+              //     AlertService.stopAlert();
+              //   },
+              //   child: const Text("Stop Alert"),
+              // ),
             ],
           ),
         ),
