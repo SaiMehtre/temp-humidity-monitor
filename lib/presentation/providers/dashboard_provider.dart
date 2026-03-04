@@ -5,6 +5,7 @@ import '../../data/mock/mock_sensor_data.dart';
 import '../../presentation/providers/interval_provider.dart';
 import '../../presentation/providers/temp_history_provider.dart'; 
 import '../../presentation/providers/humidity_history_provider.dart'; 
+import '../../data/models/sensor_point.dart';
 
 final dashboardProvider =
     StateNotifierProvider<DashboardNotifier, SensorData>((ref) {
@@ -33,16 +34,32 @@ class DashboardNotifier extends StateNotifier<SensorData> {
     final newData = MockSensorData.getData();
     state = newData;
 
+    // // ✅ Temperature history
+    // ref.read(temperatureHistoryProvider.notifier).update((prev) {
+    //   final updated = [...prev, newData.temperature];
+    //   if (updated.length > 20) updated.removeAt(0);
+    //   return updated;
+    // });
+
+    // // ✅ Humidity history
+    // ref.read(humidityHistoryProvider.notifier).update((prev) {
+    //   final updated = [...prev, newData.humidity];
+    //   if (updated.length > 20) updated.removeAt(0);
+    //   return updated;
+    // });
+
+    final now = DateTime.now();
+
     // ✅ Temperature history
     ref.read(temperatureHistoryProvider.notifier).update((prev) {
-      final updated = [...prev, newData.temperature];
+      final updated = [...prev, SensorPoint(newData.temperature, now)];
       if (updated.length > 20) updated.removeAt(0);
       return updated;
     });
 
     // ✅ Humidity history
     ref.read(humidityHistoryProvider.notifier).update((prev) {
-      final updated = [...prev, newData.humidity];
+      final updated = [...prev, SensorPoint(newData.humidity, now)];
       if (updated.length > 20) updated.removeAt(0);
       return updated;
     });
@@ -53,20 +70,25 @@ class DashboardNotifier extends StateNotifier<SensorData> {
   }
 
   void refreshData() {
-  final newData = MockSensorData.getData();
+    final newData = MockSensorData.getData();
+    final now = DateTime.now();
 
-  state = newData;
+    state = newData;
 
-  ref.read(temperatureHistoryProvider.notifier).update((prev) {
-    final updated = [...prev, newData.temperature];
+    // ✅ Temperature
+    ref.read(temperatureHistoryProvider.notifier).update((prev) {
+      final updated = [...prev, SensorPoint(newData.temperature, now)];
+      if (updated.length > 50) updated.removeAt(0);
+      return updated;
+    });
 
-    if (updated.length > 50) {
-      updated.removeAt(0);
-    }
-
-    return updated;
-  });
-}
+    // ✅ Humidity
+    ref.read(humidityHistoryProvider.notifier).update((prev) {
+      final updated = [...prev, SensorPoint(newData.humidity, now)];
+      if (updated.length > 50) updated.removeAt(0);
+      return updated;
+    });
+  }
 
   @override
   void dispose() {

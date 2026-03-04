@@ -12,8 +12,9 @@ import '../../presentation/providers/interval_provider.dart';
 import '../../presentation/providers/alert_history_provider.dart';
 import '../../data/models/alert_history.dart';
 // import '../../presentation/providers/temp_history_provider.dart';
-import '../widgets/temperature_chart.dart';
-import '../widgets/humidity_chart.dart';
+// import '../widgets/temperature_chart.dart';
+// import '../widgets/humidity_chart.dart';
+import '../widgets/combined_chart.dart';
 
 
 import 'package:hive_flutter/hive_flutter.dart';
@@ -160,9 +161,10 @@ void initState() {
           child: Column(
             children: [
               const SizedBox(height: 30),
-              const TemperatureChart(),
-              const SizedBox(height: 20),
-              const HumidityChart(),
+              // const TemperatureChart(),
+              // const SizedBox(height: 20),
+              // const HumidityChart(),
+              const CombinedChart(),
 
               StatusIndicator(isOnline: data.isOnline),
               const SizedBox(height: 20),
