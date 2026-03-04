@@ -1,31 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/temp_history_provider.dart';
+import '../providers/humidity_history_provider.dart';
 
-class TemperatureChart extends ConsumerWidget {
-  const TemperatureChart({super.key});
+class HumidityChart extends ConsumerWidget {
+  const HumidityChart({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(temperatureHistoryProvider);
+    final data = ref.watch(humidityHistoryProvider);
 
-    if (data.length <= 0) {
+    if (data.length < 2) {
       return const SizedBox(
         height: 250,
-        child: Center(child: Text("Collecting data...")),
+        child: Center(child: Text("Collecting humidity data...")),
       );
     }
 
-              print("Chart Data Length: ${data.length}");
     return SizedBox(
       height: 250,
       child: LineChart(
         LineChartData(
           minY: 0,
-          maxY: 100, // IoT temp range ke hisab se set karo
+          maxY: 100,
           gridData: FlGridData(show: true),
-          titlesData: FlTitlesData(show: true),
           borderData: FlBorderData(show: true),
           lineBarsData: [
             LineChartBarData(
@@ -34,12 +32,12 @@ class TemperatureChart extends ConsumerWidget {
                 (index) => FlSpot(index.toDouble(), data[index]),
               ),
               isCurved: true,
-              dotData: FlDotData(show: true), // 🔥 dots visible karo
+              dotData: FlDotData(show: true),
               barWidth: 3,
             ),
-          ],          
+          ],
         ),
-      )
+      ),
     );
   }
 }

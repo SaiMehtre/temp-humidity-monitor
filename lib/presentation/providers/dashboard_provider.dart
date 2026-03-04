@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/sensor_data.dart';
 import '../../data/mock/mock_sensor_data.dart';
 import '../../presentation/providers/interval_provider.dart';
-import '../../presentation/providers/temp_history_provider.dart';
+import '../../presentation/providers/temp_history_provider.dart'; 
+import '../../presentation/providers/humidity_history_provider.dart'; 
 
 final dashboardProvider =
     StateNotifierProvider<DashboardNotifier, SensorData>((ref) {
@@ -29,19 +30,26 @@ class DashboardNotifier extends StateNotifier<SensorData> {
     final seconds = ref.read(intervalProvider);
 
     _timer = Timer.periodic(Duration(seconds: seconds), (_) {
-      final newData = MockSensorData.getData();
-      state = newData;
+    final newData = MockSensorData.getData();
+    state = newData;
 
-      // 🔥 Graph history update yahi pe karo
-      final tempHistory = ref.read(temperatureHistoryProvider.notifier);
-
-      tempHistory.update((state) {
-        final updated = [...state, newData.temperature];
-        if (updated.length > 20) updated.removeAt(0);
-        return updated;
-      });
-    print("New Temp: ${newData.temperature}");
+    // ✅ Temperature history
+    ref.read(temperatureHistoryProvider.notifier).update((prev) {
+      final updated = [...prev, newData.temperature];
+      if (updated.length > 20) updated.removeAt(0);
+      return updated;
     });
+
+    // ✅ Humidity history
+    ref.read(humidityHistoryProvider.notifier).update((prev) {
+      final updated = [...prev, newData.humidity];
+      if (updated.length > 20) updated.removeAt(0);
+      return updated;
+    });
+
+    print("Temp: ${newData.temperature}");
+    print("Humidity: ${newData.humidity}");
+  });
   }
 
   void refreshData() {
