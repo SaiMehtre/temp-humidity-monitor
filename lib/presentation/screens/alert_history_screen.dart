@@ -1,35 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/alert_history_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
-class AlertHistoryScreen extends ConsumerWidget {
+class AlertHistoryScreen extends StatelessWidget {
   const AlertHistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final history = ref.watch(alertHistoryProvider);
+  Widget build(BuildContext context) {
+    final box = Hive.box('alerts');
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Alert History"),
       ),
-      body: history.isEmpty
-          ? const Center(
-              child: Text("No Alerts Yet"),
-            )
-          : ListView.builder(
-              itemCount: history.length,
-              itemBuilder: (context, index) {
-                final item = history[index];
+      body: ValueListenableBuilder(
+        valueListenable: box.listenable(),
+        builder: (context, Box box, _) {
+          if (box.isEmpty) {
+            return const Center(child: Text("No alerts yet"));
+          }
 
-                return ListTile(
-                  title: Text("${item.type} Alert"),
-                  subtitle: Text(
-                    "${item.value} at ${item.time.toLocal()}",
-                  ),
-                );
-              },
-            ),
+          return ListView.builder(
+            itemCount: box.length,
+            itemBuilder: (context, index) {
+              final alert = box.getAt(index);
+
+              final time = DateTime.parse(alert['time']);
+
+              return ListTile(
+                title: Text(alert['type']),
+                subtitle: Text(
+                    "${alert['value']}  •  ${DateFormat('dd MMM yyyy hh:mm a').format(time)}"),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

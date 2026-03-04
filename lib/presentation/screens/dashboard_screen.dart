@@ -11,6 +11,8 @@ import '../../data/services/notification_service.dart';
 import '../../presentation/providers/interval_provider.dart';
 import '../../presentation/providers/alert_history_provider.dart';
 import '../../data/models/alert_history.dart';
+import '../../presentation/providers/temp_history_provider.dart';
+import '../widgets/temperature_chart.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -20,79 +22,81 @@ class DashboardScreen extends ConsumerStatefulWidget {
       _DashboardScreenState();
 }
 
-class _DashboardScreenState
-    extends ConsumerState<DashboardScreen> {
-
-  // bool _isAlertActive = false;
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  bool _isTempAlertActive = false;
+  bool _isHumidityAlertActive = false;
 
   @override
 void initState() {
   super.initState();
 
-  Future.microtask(() {
-    ref.listen(dashboardProvider, (previous, next) {
-      final threshold = ref.read(thresholdProvider);
+  ref.listenManual(dashboardProvider, (previous, next) {
+    final threshold = ref.read(thresholdProvider);
 
-      final isTempDanger =
-          threshold.tempEnabled &&
-          next.temperature >= threshold.tempMax;
+    final isTempDanger =
+        threshold.tempEnabled &&
+        next.temperature >= threshold.tempMax;
 
-      final isHumidityDanger =
-          threshold.humidityEnabled &&
-          next.humidity >= threshold.humidityMax;
+    final isHumidityDanger =
+        threshold.humidityEnabled &&
+        next.humidity >= threshold.humidityMax;
 
-      final now = DateTime.now();
+    final now = DateTime.now();
 
-      final tempSnoozed =
-          AlertService.tempSnoozeUntil != null &&
-          now.isBefore(AlertService.tempSnoozeUntil!);
+    final tempSnoozed =
+        AlertService.tempSnoozeUntil != null &&
+        now.isBefore(AlertService.tempSnoozeUntil!);
 
-      final humiditySnoozed =
-          AlertService.humiditySnoozeUntil != null &&
-          now.isBefore(AlertService.humiditySnoozeUntil!);
+    final humiditySnoozed =
+        AlertService.humiditySnoozeUntil != null &&
+        now.isBefore(AlertService.humiditySnoozeUntil!);
 
-      bool triggered = false;
+    if (isTempDanger && !_isTempAlertActive && !tempSnoozed) {
+      _isTempAlertActive = true;
 
-      // 🔥 TEMPERATURE ALERT
-      if (isTempDanger && !tempSnoozed) {
-        triggered = true;
+      AlertService.startAlert();
+      NotificationService.showAlert(
+        "Temperature Alert",
+        "Temp: ${next.temperature}°C",
+      );
 
-        AlertService.startAlert();
+      ref.read(alertHistoryProvider.notifier).update((state) => [
+            ...state,
+            AlertHistory("Temperature", next.temperature, now)
+          ]);
+    }
 
-        NotificationService.showAlert(
-          "Temperature Alert",
-          "Temp: ${next.temperature}°C",
-        );
+    if (!isTempDanger) {
+      _isTempAlertActive = false;
+    }
 
-        ref.read(alertHistoryProvider.notifier).update((state) => [
-              ...state,
-              AlertHistory("Temperature", next.temperature, now)
-            ]);
-      }
+    if (isHumidityDanger && !_isHumidityAlertActive && !humiditySnoozed) {
+      _isHumidityAlertActive = true;
 
-      // 🔥 HUMIDITY ALERT
-      if (isHumidityDanger && !humiditySnoozed) {
-        triggered = true;
+      AlertService.startAlert();
+      NotificationService.showAlert(
+        "Humidity Alert",
+        "Humidity: ${next.humidity}%",
+      );
 
-        AlertService.startAlert();
+      ref.read(alertHistoryProvider.notifier).update((state) => [
+            ...state,
+            AlertHistory("Humidity", next.humidity, now)
+          ]);
+    }
 
-        NotificationService.showAlert(
-          "Humidity Alert",
-          "Humidity: ${next.humidity}%",
-        );
+    if (!isHumidityDanger) {
+      _isHumidityAlertActive = false;
+    }
 
-        ref.read(alertHistoryProvider.notifier).update((state) => [
-              ...state,
-              AlertHistory("Humidity", next.humidity, now)
-            ]);
-      }
+    if (!isTempDanger && !isHumidityDanger) {
+      AlertService.stopAlert();
+    }
 
-      // 🔕 Stop if no danger
-      if (!isTempDanger && !isHumidityDanger) {
-        AlertService.stopAlert();
-      }
-
-      print("TEMP: ${next.temperature}");
+    ref.read(temperatureHistoryProvider.notifier).update((state) {
+      final updated = [...state, next.temperature];
+      if (updated.length > 20) updated.removeAt(0);
+      return updated;
     });
   });
 }
@@ -143,6 +147,10 @@ void initState() {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
+              const SizedBox(height: 30),
+              const TemperatureChart(),
+              const SizedBox(height: 20),
+
               StatusIndicator(isOnline: data.isOnline),
               const SizedBox(height: 20),
 
@@ -169,6 +177,7 @@ void initState() {
               ),
 
               const SizedBox(height: 20),
+
               DropdownButton<int>(
                 value: ref.watch(intervalProvider),
                 items: const [
@@ -181,6 +190,7 @@ void initState() {
                   ref.read(dashboardProvider.notifier).refreshData();
                 },
               ),
+
               const SizedBox(height: 20),
 
               ElevatedButton(
@@ -191,6 +201,7 @@ void initState() {
               ),
 
               const SizedBox(height: 20),
+
               ElevatedButton(
                 onPressed: () {
                   AlertService.snooze(5);
