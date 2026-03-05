@@ -21,72 +21,108 @@ class CombinedChart extends ConsumerWidget {
       );
     }
 
-    return SizedBox(
-      height: 300,
-      child: LineChart(
-        LineChartData(
-          minX: 0,
-          maxX: (tempHistory.length - 1).toDouble(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
 
-          // ✅ TIME LABELS
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 2,
-                getTitlesWidget: (value, meta) {
-                  int index = value.toInt();
-                  if (index >= tempHistory.length) {
-                    return const SizedBox();
-                  }
+        // 🔹 LEGEND
+        Row(
+          children: [
+            Container(width: 12, height: 12, color: Colors.red),
+            const SizedBox(width: 4),
+            const Text("Temperature"),
 
-                  final time = tempHistory[index].time;
-                  final formatted =
-                      DateFormat.Hms().format(time); // HH:mm:ss
+            const SizedBox(width: 20),
 
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(
-                      formatted,
-                      style: const TextStyle(fontSize: 9),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          borderData: FlBorderData(show: true),
-
-          lineBarsData: [
-            // 🔥 Temperature Line
-            LineChartBarData(
-              spots: List.generate(
-                tempHistory.length,
-                (i) => FlSpot(
-                  i.toDouble(),
-                  tempHistory[i].value,
-                ),
-              ),
-              isCurved: true,
-              dotData: FlDotData(show: false),
-            ),
-
-            // 🔥 Humidity Line
-            LineChartBarData(
-              spots: List.generate(
-                humidityHistory.length,
-                (i) => FlSpot(
-                  i.toDouble(),
-                  humidityHistory[i].value,
-                ),
-              ),
-              isCurved: true,
-              dotData: FlDotData(show: false),
-            ),
+            Container(width: 12, height: 12, color: Colors.blue),
+            const SizedBox(width: 4),
+            const Text("Humidity"),
           ],
         ),
-      ),
+
+        const SizedBox(height: 10),
+
+        // 🔹 GRAPH
+        SizedBox(
+          height: 300,
+          child: LineChart(
+            LineChartData(
+              minX: 0,
+              maxX: (tempHistory.length - 1).toDouble(),
+
+              // GRID
+              gridData: FlGridData(show: true),
+
+              // BORDER
+              borderData: FlBorderData(
+                border: Border.all(color: Colors.grey),
+              ),
+
+              // TIME LABELS
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 2,
+                    getTitlesWidget: (value, meta) {
+                      int index = value.toInt();
+
+                      if (index >= tempHistory.length) {
+                        return const SizedBox();
+                      }
+
+                      final time = tempHistory[index].time;
+                      final formatted = DateFormat.Hms().format(time);
+
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          formatted,
+                          style: const TextStyle(fontSize: 9),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              // LINES
+              lineBarsData: [
+
+                // 🔴 Temperature
+                LineChartBarData(
+                  spots: List.generate(
+                    tempHistory.length,
+                    (i) => FlSpot(
+                      i.toDouble(),
+                      tempHistory[i].value,
+                    ),
+                  ),
+                  isCurved: true,
+                  color: Colors.red,
+                  barWidth: 3,
+                  dotData: FlDotData(show: false),
+                ),
+
+                // 🔵 Humidity
+                LineChartBarData(
+                  spots: List.generate(
+                    humidityHistory.length,
+                    (i) => FlSpot(
+                      i.toDouble(),
+                      humidityHistory[i].value,
+                    ),
+                  ),
+                  isCurved: true,
+                  color: Colors.blue,
+                  barWidth: 3,
+                  dotData: FlDotData(show: false),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

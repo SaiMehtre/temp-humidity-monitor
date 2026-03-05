@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:csv/csv.dart';
-import 'package:path_provider/path_provider.dart';
+// import 'package:path_provider/path_provider.dart';
 
 import '../../data/models/sensor_point.dart';
 
@@ -23,8 +23,15 @@ class CsvExporter {
 
     String csvData = const ListToCsvConverter().convert(rows);
 
-    final directory = await getApplicationDocumentsDirectory();
-    final path = "${directory.path}/sensor_data.csv";
+    // final directory = await getApplicationDocumentsDirectory();
+    // final path = "${directory.path}/sensor_data.csv";
+
+    // final file = File(path);
+    // await file.writeAsString(csvData);
+
+    // return path;
+
+    final path = "/storage/emulated/0/Download/sensor_data.csv";
 
     final file = File(path);
     await file.writeAsString(csvData);

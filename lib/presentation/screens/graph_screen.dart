@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+// import 'package:screenshot/screenshot.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart';
 
-import '../widgets/combined_chart.dart';
+// import '../widgets/combined_chart.dart';
 import '../providers/temp_history_provider.dart';
 import '../providers/humidity_history_provider.dart';
+import '../widgets/combined_chart.dart';
 import '../../core/utils/csv_exporter.dart';
 
 class GraphScreen extends ConsumerWidget {
   const GraphScreen({super.key});
 
-  static final ScreenshotController screenshotController =
-    ScreenshotController();
+  // static final ScreenshotController screenshotController =
+  //   ScreenshotController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,21 +39,21 @@ class GraphScreen extends ConsumerWidget {
             },
           ),
 
-          // 🖼 PNG EXPORT BUTTON
-          IconButton(
-            icon: const Icon(Icons.image),
-            onPressed: () async {
-              final image = await screenshotController.capture();
+        //   // 🖼 PNG EXPORT BUTTON
+        //   IconButton(
+        //     icon: const Icon(Icons.image),
+        //     onPressed: () async {
+        //       final image = await screenshotController.capture();
 
-              if (image != null) {
-                await ImageGallerySaver.saveImage(image);
+        //       if (image != null) {
+        //         await ImageGallerySaver.saveImage(image);
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("PNG saved to gallery")),
-                );
-              }
-            },
-          ),
+        //         ScaffoldMessenger.of(context).showSnackBar(
+        //           const SnackBar(content: Text("PNG saved to gallery")),
+        //         );
+        //       }
+        //     },
+        //   ),
         ],
       ),
 
@@ -76,14 +77,22 @@ class GraphScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
 
                 // 📈 CHART WITH ZOOM + SCREENSHOT
+                // Expanded(
+                //   child: Screenshot(
+                //     controller: screenshotController,
+                //     child: InteractiveViewer(
+                //       minScale: 0.5,
+                //       maxScale: 3,
+                //       child: const CombinedChart(),
+                //     ),
+                //   ),
+                // ),
+
                 Expanded(
-                  child: Screenshot(
-                    controller: screenshotController,
-                    child: InteractiveViewer(
-                      minScale: 0.5,
-                      maxScale: 3,
-                      child: const CombinedChart(),
-                    ),
+                  child: InteractiveViewer(
+                    minScale: 0.5,
+                    maxScale: 3,
+                    child: const CombinedChart(),
                   ),
                 ),
               ],
