@@ -31,7 +31,7 @@ class AlertService {
     _isPlaying = true;
 
     await _player.setReleaseMode(ReleaseMode.loop);
-    await _player.play(AssetSource('sounds/alert.wav'));
+    await _player.play(AssetSource('sounds/siren.mp3'));
   }
 
   static Future<void> stopAlert() async {

@@ -31,7 +31,7 @@ class GraphScreen extends ConsumerWidget {
               final path = await CsvExporter.export(temp, humidity);
 
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("CSV saved at $path")),
+                SnackBar(content: Text("CSV saved at $path"),duration: const Duration(seconds: 4),),
               );
             },
           ),
