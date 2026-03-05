@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:screenshot/screenshot.dart';
-// import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
-// import '../widgets/combined_chart.dart';
+import '../widgets/combined_chart.dart';
 import '../providers/temp_history_provider.dart';
 import '../providers/humidity_history_provider.dart';
-import '../widgets/combined_chart.dart';
 import '../../core/utils/csv_exporter.dart';
 
 class GraphScreen extends ConsumerWidget {
   const GraphScreen({super.key});
 
-  // static final ScreenshotController screenshotController =
-  //   ScreenshotController();
+  static final ScreenshotController screenshotController =
+      ScreenshotController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,7 +23,8 @@ class GraphScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text("Sensor History"),
         actions: [
-          // 🔽 CSV EXPORT BUTTON
+
+          // 📥 CSV EXPORT
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () async {
@@ -39,21 +39,21 @@ class GraphScreen extends ConsumerWidget {
             },
           ),
 
-        //   // 🖼 PNG EXPORT BUTTON
-        //   IconButton(
-        //     icon: const Icon(Icons.image),
-        //     onPressed: () async {
-        //       final image = await screenshotController.capture();
+          // 🖼 SAVE GRAPH IMAGE
+          IconButton(
+            icon: const Icon(Icons.image),
+            onPressed: () async {
+              final image = await screenshotController.capture();
 
-        //       if (image != null) {
-        //         await ImageGallerySaver.saveImage(image);
+              if (image != null) {
+                await ImageGallerySaver.saveImage(image);
 
-        //         ScaffoldMessenger.of(context).showSnackBar(
-        //           const SnackBar(content: Text("PNG saved to gallery")),
-        //         );
-        //       }
-        //     },
-        //   ),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Graph saved to gallery")),
+                );
+              }
+            },
+          ),
         ],
       ),
 
@@ -66,6 +66,7 @@ class GraphScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
                 // 📊 DATA COUNT
                 Text(
                   "Temp points: $tempCount | Humidity points: $humidityCount",
@@ -74,25 +75,34 @@ class GraphScreen extends ConsumerWidget {
                   ),
                 ),
 
+                const SizedBox(height: 10),
+
+                // 📊 LEGEND
+                Row(
+                  children: [
+                    Container(width: 12, height: 12, color: Colors.red),
+                    const SizedBox(width: 4),
+                    const Text("Temperature"),
+
+                    const SizedBox(width: 20),
+
+                    Container(width: 12, height: 12, color: Colors.blue),
+                    const SizedBox(width: 4),
+                    const Text("Humidity"),
+                  ],
+                ),
+
                 const SizedBox(height: 16),
 
-                // 📈 CHART WITH ZOOM + SCREENSHOT
-                // Expanded(
-                //   child: Screenshot(
-                //     controller: screenshotController,
-                //     child: InteractiveViewer(
-                //       minScale: 0.5,
-                //       maxScale: 3,
-                //       child: const CombinedChart(),
-                //     ),
-                //   ),
-                // ),
-
+                // 📈 GRAPH
                 Expanded(
-                  child: InteractiveViewer(
-                    minScale: 0.5,
-                    maxScale: 3,
-                    child: const CombinedChart(),
+                  child: Screenshot(
+                    controller: screenshotController,
+                    child: InteractiveViewer(
+                      minScale: 0.5,
+                      maxScale: 3,
+                      child: const CombinedChart(),
+                    ),
                   ),
                 ),
               ],
