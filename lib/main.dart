@@ -37,8 +37,8 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Temp & Humidity Monitor',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      // theme: AppTheme.lightTheme,
+      // darkTheme: AppTheme.darkTheme,
       // themeMode: themeMode,
       home: const HomeScreen(),
     );

@@ -192,11 +192,25 @@ void initState() {
               ),
 
               const SizedBox(height: 20),
-
+              
+              // DropdownButton<int>(
+              //   value: ref.watch(intervalProvider),
+              //   items: const [
+              //     DropdownMenuItem(value: 10, child: Text("10 Seconds")),
+              //     DropdownMenuItem(value: 60, child: Text("1 Minute")),
+              //     DropdownMenuItem(value: 300, child: Text("5 Minutes")),
+              //   ],
+              //   onChanged: (value) {
+              //     ref.read(intervalProvider.notifier).state = value!;
+              //     ref.read(dashboardProvider.notifier).refreshData();
+              //   },
+              // ),
               DropdownButton<int>(
-                value: ref.watch(intervalProvider),
+                value: [10,60,300].contains(ref.watch(intervalProvider))
+                    ? ref.watch(intervalProvider)
+                    : 10,
                 items: const [
-                  DropdownMenuItem(value: 30, child: Text("30 Seconds")),
+                  DropdownMenuItem(value: 10, child: Text("10 Seconds")),
                   DropdownMenuItem(value: 60, child: Text("1 Minute")),
                   DropdownMenuItem(value: 300, child: Text("5 Minutes")),
                 ],

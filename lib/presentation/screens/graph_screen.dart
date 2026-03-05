@@ -1,7 +1,6 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 import '../widgets/combined_chart.dart';
 import '../providers/temp_history_provider.dart';
@@ -9,10 +8,9 @@ import '../providers/humidity_history_provider.dart';
 import '../../core/utils/csv_exporter.dart';
 
 class GraphScreen extends ConsumerWidget {
-  const GraphScreen({super.key});
+  GraphScreen({super.key});
 
-  static final ScreenshotController screenshotController =
-      ScreenshotController();
+  final GlobalKey chartKey = GlobalKey();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,8 +21,7 @@ class GraphScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text("Sensor History"),
         actions: [
-
-          // 📥 CSV EXPORT
+          // CSV EXPORT
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () async {
@@ -38,25 +35,8 @@ class GraphScreen extends ConsumerWidget {
               );
             },
           ),
-
-          // 🖼 SAVE GRAPH IMAGE
-          IconButton(
-            icon: const Icon(Icons.image),
-            onPressed: () async {
-              final image = await screenshotController.capture();
-
-              if (image != null) {
-                await ImageGallerySaver.saveImage(image);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Graph saved to gallery")),
-                );
-              }
-            },
-          ),
         ],
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Card(
@@ -66,26 +46,21 @@ class GraphScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
-                // 📊 DATA COUNT
+                // DATA COUNT
                 Text(
                   "Temp points: $tempCount | Humidity points: $humidityCount",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
 
                 const SizedBox(height: 10),
 
-                // 📊 LEGEND
+                // LEGEND
                 Row(
                   children: [
                     Container(width: 12, height: 12, color: Colors.red),
                     const SizedBox(width: 4),
                     const Text("Temperature"),
-
                     const SizedBox(width: 20),
-
                     Container(width: 12, height: 12, color: Colors.blue),
                     const SizedBox(width: 4),
                     const Text("Humidity"),
@@ -94,10 +69,10 @@ class GraphScreen extends ConsumerWidget {
 
                 const SizedBox(height: 16),
 
-                // 📈 GRAPH
+                // GRAPH
                 Expanded(
-                  child: Screenshot(
-                    controller: screenshotController,
+                  child: RepaintBoundary(
+                    key: chartKey,
                     child: InteractiveViewer(
                       minScale: 0.5,
                       maxScale: 3,
