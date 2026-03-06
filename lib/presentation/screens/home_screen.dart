@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'graph_screen.dart';
 import 'settings_screen.dart';
-// import 'alert_history_screen.dart';
+import 'alert_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,35 +18,50 @@ class _HomeScreenState extends State<HomeScreen> {
     DashboardScreen(),
     GraphScreen(),
     SettingsScreen(),
-    // AlertHistoryScreen(),
+    AlertHistoryScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() => _currentIndex = index);
+
+      bottomNavigationBar: NavigationBar(
+        height: 70,
+        selectedIndex: _currentIndex,
+        backgroundColor: Colors.white,
+        indicatorColor: Colors.blue.shade100,
+
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
+
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard),
             label: "Dashboard",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.show_chart),
+
+          NavigationDestination(
+            icon: Icon(Icons.show_chart_outlined),
+            selectedIcon: Icon(Icons.show_chart),
             label: "Graph",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
+
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
             label: "Settings",
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.add_alert),
-          //   label: "AlertHistory",
-          // ),
+
+          NavigationDestination(
+            icon: Icon(Icons.notifications_outlined),
+            selectedIcon: Icon(Icons.notifications),
+            label: "Alerts",
+          ),
         ],
       ),
     );
