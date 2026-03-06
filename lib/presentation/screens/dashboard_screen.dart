@@ -92,9 +92,15 @@ void initState() {
         "Humidity: ${next.humidity}%",
       );
 
+      // ✅ Save humidity alert to Hive (this was missing)
+      final box = Hive.box('alerts');
+      final alert = AlertHistory("Humidity", next.humidity, now);
+      box.add(alert);
+
+      // ✅ Update Riverpod state
       ref.read(alertHistoryProvider.notifier).update((state) => [
             ...state,
-            AlertHistory("Humidity", next.humidity, now)
+            alert
           ]);
     }
 
