@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'graph_screen.dart';
 import 'settings_screen.dart';
+// import 'alert_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
     DashboardScreen(),
     GraphScreen(),
     SettingsScreen(),
+    // AlertHistoryScreen(),
   ];
 
   @override
@@ -41,6 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.settings),
             label: "Settings",
           ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.add_alert),
+          //   label: "AlertHistory",
+          // ),
         ],
       ),
     );

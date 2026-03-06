@@ -75,7 +75,7 @@ class ThermometerTube extends StatelessWidget {
           /// OUTER TUBE
           Container(
             width: 90,
-            height: 260,
+            height: 290,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.black54, width: 4),
               borderRadius: BorderRadius.circular(40),
@@ -89,7 +89,7 @@ class ThermometerTube extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 500),
               width: 40,
-              height: 210 * level,
+              height: 240 * level,
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.circular(20),
