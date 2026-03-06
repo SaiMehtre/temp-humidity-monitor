@@ -160,11 +160,11 @@ void initState() {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              const SizedBox(height: 30),
+              // const SizedBox(height: 30),
               // const TemperatureChart(),
               // const SizedBox(height: 20),
               // const HumidityChart(),
-              const CombinedChart(),
+              // const CombinedChart(),
 
               StatusIndicator(isOnline: data.isOnline),
               const SizedBox(height: 20),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:auto_size_text/auto_size_text.dart';
 import '../../data/models/alert_type.dart';
+import 'thermometer_tube.dart';
 
 class SensorCard extends StatefulWidget {
   final String title;
@@ -85,6 +86,9 @@ class _SensorCardState extends State<SensorCard>
       builder: (context, child) {
         return Container(
           padding: const EdgeInsets.all(16),
+          constraints: const BoxConstraints(
+            minHeight: 380,
+          ),
           decoration: BoxDecoration(
             color: getBackgroundColor(),
             borderRadius: BorderRadius.circular(20),
@@ -94,19 +98,46 @@ class _SensorCardState extends State<SensorCard>
               width: 2,
             ),
           ),
-          child: Row(
+          child: Column(
             children: [
-              CircleAvatar(
-                backgroundColor: getBorderColor(),
-                child: Icon(widget.icon, color: Colors.white),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(widget.icon, color: getBorderColor(), size: 28),
+                  const SizedBox(width: 8),
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  "${widget.title}\n${widget.value}",
-                  style: const TextStyle(fontSize: 18),
+
+              const SizedBox(height: 12),
+
+              if (widget.title == "Temperature")
+                ThermometerTube(
+                  temperature: double.tryParse(
+                        widget.value.replaceAll(RegExp('[^0-9.-]'), ''),
+                      ) ??
+                      0,
+                  alertType: widget.alertType,
+                )
+                // IndustrialThermometer(
+                //   temperature: 42.5,
+                //   dangerTemp: 35,
+                // )
+              else
+                Text(
+                  widget.value,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
             ],
           ),
         );
