@@ -1,16 +1,44 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import '../../data/models/alert_type.dart';
 
 class HumidityGauge extends StatelessWidget {
   final double humidity;
+  final AlertType alertType;
 
   const HumidityGauge({
     super.key,
     required this.humidity,
+    required this.alertType,
   });
+
+  double normalize() {
+    const min = 0;
+    const max = 100;
+
+    double value = (humidity - min) / (max - min);
+
+    if (value < 0) value = 0;
+    if (value > 1) value = 1;
+
+    return value;
+  }
+
+  Color getColor() {
+    switch (alertType) {
+      case AlertType.high:
+        return Colors.red;
+      case AlertType.low:
+        return Colors.orange;
+      case AlertType.normal:
+        return Colors.blue;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final percent = normalize();
+    final gaugeColor = getColor();
+
     return SizedBox(
       height: 180,
       width: 180,
@@ -18,24 +46,23 @@ class HumidityGauge extends StatelessWidget {
         alignment: Alignment.center,
         children: [
 
-          /// Background Circle
+          /// Gauge
           SizedBox(
             height: 160,
             width: 160,
             child: CircularProgressIndicator(
-              value: humidity / 100,
+              value: percent,
               strokeWidth: 12,
               backgroundColor: Colors.grey.shade300,
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(Colors.blue),
+              valueColor: AlwaysStoppedAnimation<Color>(gaugeColor),
             ),
           ),
 
-          /// Value Text
+          /// Value
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.water_drop, color: Colors.blue, size: 30),
+              Icon(Icons.water_drop, color: gaugeColor, size: 30),
               Text(
                 "${humidity.toStringAsFixed(0)}%",
                 style: const TextStyle(
@@ -43,7 +70,7 @@ class HumidityGauge extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Text("Humidity")
+              const Text("Humidity"),
             ],
           ),
         ],

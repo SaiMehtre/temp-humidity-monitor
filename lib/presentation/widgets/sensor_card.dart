@@ -92,6 +92,13 @@ class _SensorCardState extends State<SensorCard>
         0;
   }
 
+  double getHumidity() {
+  return double.tryParse(
+        widget.value.replaceAll(RegExp('[^0-9.-]'), ''),
+      ) ??
+      0;
+}
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -148,35 +155,30 @@ class _SensorCardState extends State<SensorCard>
 
                 /// SENSOR CONTENT
                 /// SENSOR CONTENT
-                if (this.widget.title == "Temperature")
-                  Column(
-                    children: [
-
-                      IndustrialThermometer(
-                        temperature: getTemperature(),
-                        alertType: this.widget.alertType,
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      HumidityGauge(
-                        humidity: 65,
-                      ),
-
-                    ],
-                  )
-                else
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    child: Text(
-                      this.widget.value,
-                      key: ValueKey(this.widget.value),
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                /// SENSOR CONTENT
+/// SENSOR CONTENT
+if (widget.title == "Temperature")
+  IndustrialThermometer(
+    temperature: getTemperature(),
+    alertType: widget.alertType,
+  )
+else if (widget.title == "Humidity")
+  HumidityGauge(
+    humidity: getHumidity(),
+    alertType: widget.alertType,
+  )
+else
+  AnimatedSwitcher(
+    duration: const Duration(milliseconds: 500),
+    child: Text(
+      widget.value,
+      key: ValueKey(widget.value),
+      style: const TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  ),
 
                 const SizedBox(height: 20),
 
