@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../data/models/alert_type.dart';
 
-class ThermometerTube extends StatelessWidget {
+class IndustrialThermometer extends StatelessWidget {
   final double temperature;
   final AlertType alertType;
 
-  const ThermometerTube({
+  const IndustrialThermometer({
     super.key,
     required this.temperature,
     required this.alertType,
@@ -36,99 +36,141 @@ class ThermometerTube extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final level = normalize();
-    final color = getColor();
+    final percent = normalize();
+    final mercuryColor = getColor();
 
     return SizedBox(
-      height: 340,
+      width: 130,
+      height: 420,
       child: Stack(
         alignment: Alignment.center,
         children: [
 
           /// SCALE MARKS
           Positioned.fill(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                11,
-                (i) => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 30,
-                      height: 2,
-                      color: Colors.black45,
-                    ),
-                    // const SizedBox(width: 30),
-                    Container(
-                      width: 30,
-                      height: 2,
-                      color: Colors.black45,
-                    ),
-                  ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(
+                  11,
+                  (i) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(width: 22, height: 2, color: Colors.black45),
+                      Container(width: 22, height: 2, color: Colors.black45),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
 
-          /// OUTER TUBE
+          /// GLASS TUBE
           Container(
-            width: 90,
-            height: 290,
+            width: 30,
+            height: 340,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black54, width: 4),
-              borderRadius: BorderRadius.circular(40),
-              color: Colors.white,
-            ),
-          ),
-
-          /// MERCURY FILL
-          Positioned(
-            bottom: 35,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 500),
-              width: 40,
-              height: 240 * level,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.grey.shade500, width: 3),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withOpacity(0.9),
+                  Colors.grey.shade200,
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
+            ),
+
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+
+                /// MERCURY
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 700),
+                  width: 18,
+                  height: 340 * percent,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        mercuryColor.withOpacity(0.7),
+                        mercuryColor,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+
+                /// GLASS SHINE
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    width: 6,
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.7),
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
           /// BULB
           Positioned(
-            bottom: 0,
+            bottom: 10,
             child: Container(
-              width: 90,
-              height: 90,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color,
-                border: Border.all(color: Colors.black54, width: 4),
+                gradient: RadialGradient(
+                  colors: [
+                    mercuryColor.withOpacity(0.8),
+                    mercuryColor,
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: mercuryColor.withOpacity(0.6),
+                    blurRadius: 14,
+                    spreadRadius: 4,
+                  )
+                ],
               ),
             ),
           ),
 
           /// TEMPERATURE TEXT
           Positioned(
-            top: 0,
+            top: 10,
             child: Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(10),
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 "${temperature.toStringAsFixed(1)} °C",
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ),

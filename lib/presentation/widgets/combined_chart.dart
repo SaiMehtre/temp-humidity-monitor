@@ -36,7 +36,6 @@ class CombinedBarChart extends ConsumerWidget {
 
     final yMax = (tempMax > humidityMax ? tempMax : humidityMax) * 1.2;
 
-    // Dynamic interval for X-axis labels
     int interval = 1;
     if (maxX > 20) interval = (maxX / 10).ceil();
     if (maxX > 50) interval = (maxX / 15).ceil();
@@ -46,11 +45,21 @@ class CombinedBarChart extends ConsumerWidget {
       child: BarChart(
         BarChartData(
           maxY: yMax,
+          minY: 0,
           gridData: FlGridData(show: true),
           borderData: FlBorderData(border: Border.all(color: Colors.grey)),
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: true, interval: yMax / 5),
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: yMax / 5,
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    value.toInt().toString(), // ✅ force integers
+                    style: const TextStyle(fontSize: 10),
+                  );
+                },
+              ),
             ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
