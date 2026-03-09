@@ -6,8 +6,8 @@ import 'package:intl/intl.dart';
 import '../providers/temp_history_provider.dart';
 import '../providers/humidity_history_provider.dart';
 
-class CombinedBarChart extends ConsumerWidget {
-  const CombinedBarChart({super.key});
+class ScrollableBarChart extends ConsumerWidget {
+  const ScrollableBarChart({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,72 +36,82 @@ class CombinedBarChart extends ConsumerWidget {
 
     final yMax = (tempMax > humidityMax ? tempMax : humidityMax) * 1.2;
 
-    int interval = 1;
-    if (maxX > 20) interval = (maxX / 10).ceil();
-    if (maxX > 50) interval = (maxX / 15).ceil();
+    // Bottom labels: max 6 on mobile for readability
+    int totalPoints = maxX;
+    int bottomInterval = 1;
+    if (totalPoints > 6) bottomInterval = (totalPoints / 5).ceil();
+
+    // Width of each group (bar + spacing)
+    const double groupWidth = 24;
 
     return SizedBox(
       height: 300,
-      child: BarChart(
-        BarChartData(
-          maxY: yMax,
-          minY: 0,
-          gridData: FlGridData(show: true),
-          borderData: FlBorderData(border: Border.all(color: Colors.grey)),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: yMax / 5,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    value.toInt().toString(), // ✅ force integers
-                    style: const TextStyle(fontSize: 10),
-                  );
-                },
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(
+          width: maxX * groupWidth.toDouble() + 16,
+          child: BarChart(
+            BarChartData(
+              maxY: yMax,
+              minY: 0,
+              gridData: FlGridData(show: true),
+              borderData: FlBorderData(border: Border.all(color: Colors.grey)),
+              titlesData: FlTitlesData(
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: yMax / 5,
+                    getTitlesWidget: (value, meta) {
+                      return Text(
+                        value.toInt().toString(),
+                        style: const TextStyle(fontSize: 10),
+                      );
+                    },
+                  ),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: bottomInterval.toDouble(),
+                    getTitlesWidget: (value, meta) {
+                      int index = value.toInt();
+                      if (index < 0 || index >= tempHistory.length) return const SizedBox();
+                      final time = tempHistory[index].time;
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          DateFormat('HH:mm').format(time),
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: interval.toDouble(),
-                getTitlesWidget: (value, meta) {
-                  int index = value.toInt();
-                  if (index < 0 || index >= tempHistory.length) return const SizedBox();
-                  final time = tempHistory[index].time;
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(
-                      DateFormat('HH:mm').format(time),
-                      style: const TextStyle(fontSize: 10),
+              barGroups: List.generate(maxX, (i) {
+                final temp = i < tempHistory.length ? tempHistory[i].value : 0.0;
+                final humidity = i < humidityHistory.length ? humidityHistory[i].value : 0.0;
+                return BarChartGroupData(
+                  x: i,
+                  barsSpace: 4,
+                  barRods: [
+                    BarChartRodData(
+                      toY: temp,
+                      width: 8,
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                  );
-                },
-              ),
+                    BarChartRodData(
+                      toY: humidity,
+                      width: 8,
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ],
+                );
+              }),
             ),
           ),
-          barGroups: List.generate(maxX, (i) {
-            final temp = i < tempHistory.length ? tempHistory[i].value : 0.0;
-            final humidity = i < humidityHistory.length ? humidityHistory[i].value : 0.0;
-            return BarChartGroupData(
-              x: i,
-              barsSpace: 4,
-              barRods: [
-                BarChartRodData(
-                  toY: temp,
-                  width: 8,
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                BarChartRodData(
-                  toY: humidity,
-                  width: 8,
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ],
-            );
-          }),
         ),
       ),
     );

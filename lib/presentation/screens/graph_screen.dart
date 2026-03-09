@@ -76,7 +76,7 @@
                       child: InteractiveViewer(
                         minScale: 0.5,
                         maxScale: 3,
-                        child: const CombinedBarChart(),
+                        child: const ScrollableBarChart(),
                       ),
                     ),
                   ),

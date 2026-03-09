@@ -11,17 +11,29 @@ class IndustrialThermometer extends StatelessWidget {
     required this.alertType,
   });
 
+  // double normalize() {
+  //   const min = -20;
+  //   const max = 100;
+
+  //   double value = (temperature - min) / (max - min);
+
+  //   if (value < 0) value = 0;
+  //   if (value > 1) value = 1;
+
+  //   return value;
+  // }
+
   double normalize() {
-    const min = -20;
-    const max = 100;
+  const min = 0;
+  const max = 100;
 
-    double value = (temperature - min) / (max - min);
+  double value = (temperature - min) / (max - min);
 
-    if (value < 0) value = 0;
-    if (value > 1) value = 1;
+  if (value < 0) value = 0;
+  if (value > 1) value = 1;
 
-    return value;
-  }
+  return value;
+}
 
   Color getColor() {
     switch (alertType) {
@@ -40,48 +52,84 @@ class IndustrialThermometer extends StatelessWidget {
     final mercuryColor = getColor();
 
     return SizedBox(
-      width: 130,
+      width: 190,
       height: 420,
       child: Stack(
         alignment: Alignment.center,
         children: [
 
           /// SCALE MARKS
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(
-                  11,
-                  (i) => Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(width: 22, height: 2, color: Colors.black45),
-                      Container(width: 22, height: 2, color: Colors.black45),
-                    ],
+          /// SCALE MARKS + NUMBERS
+          /// SCALE MARKS + NUMBERS (RIGHT SIDE)
+          /// SCALE MARKS + NUMBERS (CENTERED WITH TUBE)
+Positioned(
+  left: 15,
+  top: 30,
+  bottom: 30,
+  child: SizedBox(
+    width: 180, // full thermometer width
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(11, (i) {
+        int value = (10 - i) * 10;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            /// LEFT TICK
+            Container(
+              width: 20,
+              height: 2,
+              color: Colors.black45,
+            ),
+
+            /// GAP FOR TUBE CENTER
+            SizedBox(width: 70),
+
+            /// RIGHT SIDE (tick + number)
+            Row(
+              children: [
+                Container(
+                  width: 20,
+                  height: 2,
+                  color: Colors.black45,
+                ),
+                const SizedBox(width: 6),
+                SizedBox(
+                  width: 28,
+                  child: Text(
+                    "$value",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ),
-
+          ],
+        );
+      }),
+    ),
+  ),
+),
           /// GLASS TUBE
-          Container(
-            width: 30,
-            height: 340,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.grey.shade500, width: 3),
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withOpacity(0.9),
-                  Colors.grey.shade200,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+           Center(
+  child: Container(
+    width: 30,
+    height: 340,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey.shade500, width: 3),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.9),
+                    Colors.grey.shade200,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
               ),
-            ),
 
             child: Stack(
               alignment: Alignment.bottomCenter,
@@ -127,6 +175,7 @@ class IndustrialThermometer extends StatelessWidget {
               ],
             ),
           ),
+           ),
 
           /// BULB
           Positioned(
@@ -155,7 +204,7 @@ class IndustrialThermometer extends StatelessWidget {
 
           /// TEMPERATURE TEXT
           Positioned(
-            top: 10,
+            top: 0,
             child: Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12,
