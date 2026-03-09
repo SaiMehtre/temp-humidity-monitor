@@ -16,7 +16,7 @@ class ScrollableBarChart extends ConsumerWidget {
 
     if (tempHistory.isEmpty && humidityHistory.isEmpty) {
       return const SizedBox(
-        height: 300,
+        height: 340,
         child: Center(child: Text("No Data")),
       );
     }
@@ -42,14 +42,17 @@ class ScrollableBarChart extends ConsumerWidget {
     if (totalPoints > 6) bottomInterval = (totalPoints / 5).ceil();
 
     // Width of each group (bar + spacing)
-    const double groupWidth = 24;
+    const double groupWidth = 40;
 
-    return SizedBox(
-      height: 300,
+    return AspectRatio(
+      // height: 320,
+      aspectRatio: 1.2,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SizedBox(
           width: maxX * groupWidth.toDouble() + 16,
+          child: Padding(
+          padding: const EdgeInsets.only(top: 12, bottom: 20),
           child: BarChart(
             BarChartData(
               maxY: 100,
@@ -57,46 +60,74 @@ class ScrollableBarChart extends ConsumerWidget {
               gridData: FlGridData(show: true),
               borderData: FlBorderData(border: Border.all(color: Colors.grey)),
               titlesData: FlTitlesData(
+                topTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     interval: 10,
+                    reservedSize: 50,
                     getTitlesWidget: (value, meta) {
-                      return Text(
-                        value.toInt().toString(),
-                        style: const TextStyle(fontSize: 10),
-                      );
-                    },
-                  ),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: bottomInterval.toDouble(),
-                    getTitlesWidget: (value, meta) {
-                      // int index = value.toInt();
-                      int index = tempHistory.length - 1 - value.toInt();
-                      if (index < 0 || index >= tempHistory.length) return const SizedBox();
-                      final time = tempHistory[index].time;
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 6),
+                      return SizedBox(
+                        width: 40,
                         child: Text(
-                          DateFormat('HH:mm').format(time),
+                          value.toInt().toString(),
+                          textAlign: TextAlign.right,
                           style: const TextStyle(fontSize: 10),
                         ),
                       );
                     },
                   ),
                 ),
+                bottomTitles: AxisTitles(
+                  axisNameSize: 30, 
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: bottomInterval.toDouble(),
+                    getTitlesWidget: (value, meta) {
+                      int index = tempHistory.length - 1 - value.toInt();
+                      if (index < 0 || index >= tempHistory.length) {
+                        return const SizedBox();
+                      }
+
+                      final time = tempHistory[index].time;
+
+                      return SideTitleWidget(
+                        meta: meta,
+                        child: Transform.rotate(
+                          angle: -0.8, // rotate labels
+                          child: Text(
+                            // DateFormat('HH:mm:ss').format(time),  // Use this if you want sec aslo
+                            DateFormat('HH:mm').format(time),  
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ),
+                      );
+                    }
+                  ),
+                ),
               ),
               barGroups: List.generate(maxX, (i) {
                 // final temp = i < tempHistory.length ? tempHistory[i].value : 0.0;
                 // final humidity = i < humidityHistory.length ? humidityHistory[i].value : 0.0;
-                final tempIndex = tempHistory.length - 1 - i;
-                final humIndex = humidityHistory.length - 1 - i;
+                final tempIndex = maxX - 1 - i;
+                final humIndex = maxX - 1 - i;
 
-                final temp = tempIndex >= 0 ? tempHistory[tempIndex].value : 0.0;
-                final humidity = humIndex >= 0 ? humidityHistory[humIndex].value : 0.0;
+                // final temp = tempIndex >= 0 ? tempHistory[tempIndex].value : 0.0;
+                // final humidity = humIndex >= 0 ? humidityHistory[humIndex].value : 0.0;
+                final temp =
+                    (tempIndex >= 0 && tempIndex < tempHistory.length)
+                        ? tempHistory[tempIndex].value
+                        : 0.0;
+
+                final humidity =
+                    (humIndex >= 0 && humIndex < humidityHistory.length)
+                        ? humidityHistory[humIndex].value
+                        : 0.0;
                 return BarChartGroupData(
                   x: i,
                   // x: maxX - i - 1,
@@ -118,6 +149,7 @@ class ScrollableBarChart extends ConsumerWidget {
                 );
               }),
             ),
+          ),
           ),
         ),
       ),
