@@ -62,62 +62,62 @@ class IndustrialThermometer extends StatelessWidget {
           /// SCALE MARKS + NUMBERS
           /// SCALE MARKS + NUMBERS (RIGHT SIDE)
           /// SCALE MARKS + NUMBERS (CENTERED WITH TUBE)
-Positioned(
-  left: 15,
-  top: 30,
-  bottom: 30,
-  child: SizedBox(
-    width: 180, // full thermometer width
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(11, (i) {
-        int value = (10 - i) * 10;
+          Positioned(
+          left: 15,
+          top: 30,
+          bottom: 30,
+          child: SizedBox(
+            width: 180, // full thermometer width
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(11, (i) {
+                int value = (10 - i) * 10;
 
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            /// LEFT TICK
-            Container(
-              width: 20,
-              height: 2,
-              color: Colors.black45,
-            ),
-
-            /// GAP FOR TUBE CENTER
-            SizedBox(width: 70),
-
-            /// RIGHT SIDE (tick + number)
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 2,
-                  color: Colors.black45,
-                ),
-                const SizedBox(width: 6),
-                SizedBox(
-                  width: 28,
-                  child: Text(
-                    "$value",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    /// LEFT TICK
+                    Container(
+                      width: 20,
+                      height: 2,
+                      color: Colors.black45,
                     ),
-                  ),
-                ),
-              ],
+
+                    /// GAP FOR TUBE CENTER
+                    SizedBox(width: 70),
+
+                    /// RIGHT SIDE (tick + number)
+                    Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 2,
+                          color: Colors.black45,
+                        ),
+                        const SizedBox(width: 6),
+                        SizedBox(
+                          width: 28,
+                          child: Text(
+                            "$value",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }),
             ),
-          ],
-        );
-      }),
-    ),
-  ),
-),
+          ),
+        ),
           /// GLASS TUBE
-           Center(
-  child: Container(
-    width: 30,
-    height: 340,
+          Center(
+            child: Container(
+              width: 30,
+              height: 340,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.grey.shade500, width: 3),
@@ -131,51 +131,51 @@ Positioned(
                 ),
               ),
 
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
 
-                /// MERCURY
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 700),
-                  width: 18,
-                  height: 340 * percent,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: LinearGradient(
-                      colors: [
-                        mercuryColor.withOpacity(0.7),
-                        mercuryColor,
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                ),
-
-                /// GLASS SHINE
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    width: 6,
-                    margin: const EdgeInsets.symmetric(vertical: 20),
+                  /// MERCURY
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 700),
+                    width: 18,
+                    height: 340 * percent,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       gradient: LinearGradient(
                         colors: [
-                          Colors.white.withOpacity(0.7),
-                          Colors.transparent,
+                          mercuryColor.withOpacity(0.7),
+                          mercuryColor,
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
                     ),
                   ),
-                ),
-              ],
+
+                  /// GLASS SHINE
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 6,
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.7),
+                            Colors.transparent,
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-           ),
 
           /// BULB
           Positioned(

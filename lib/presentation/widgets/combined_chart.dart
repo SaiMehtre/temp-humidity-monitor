@@ -26,15 +26,15 @@ class ScrollableBarChart extends ConsumerWidget {
       humidityHistory.length
     ].reduce((a, b) => a > b ? a : b);
 
-    final tempMax = tempHistory.isNotEmpty
-        ? tempHistory.map((e) => e.value).reduce((a, b) => a > b ? a : b)
-        : 50.0;
+    // final tempMax = tempHistory.isNotEmpty
+    //     ? tempHistory.map((e) => e.value).reduce((a, b) => a > b ? a : b)
+    //     : 50.0;
 
-    final humidityMax = humidityHistory.isNotEmpty
-        ? humidityHistory.map((e) => e.value).reduce((a, b) => a > b ? a : b)
-        : 100.0;
+    // final humidityMax = humidityHistory.isNotEmpty
+    //     ? humidityHistory.map((e) => e.value).reduce((a, b) => a > b ? a : b)
+    //     : 100.0;
 
-    final yMax = (tempMax > humidityMax ? tempMax : humidityMax) * 1.2;
+    // final yMax = (tempMax > humidityMax ? tempMax : humidityMax) * 1.2;
 
     // Bottom labels: max 6 on mobile for readability
     int totalPoints = maxX;
@@ -52,7 +52,7 @@ class ScrollableBarChart extends ConsumerWidget {
           width: maxX * groupWidth.toDouble() + 16,
           child: BarChart(
             BarChartData(
-              maxY: yMax,
+              maxY: 100,
               minY: 0,
               gridData: FlGridData(show: true),
               borderData: FlBorderData(border: Border.all(color: Colors.grey)),
@@ -60,7 +60,7 @@ class ScrollableBarChart extends ConsumerWidget {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: yMax / 5,
+                    interval: 10,
                     getTitlesWidget: (value, meta) {
                       return Text(
                         value.toInt().toString(),
@@ -74,7 +74,8 @@ class ScrollableBarChart extends ConsumerWidget {
                     showTitles: true,
                     interval: bottomInterval.toDouble(),
                     getTitlesWidget: (value, meta) {
-                      int index = value.toInt();
+                      // int index = value.toInt();
+                      int index = tempHistory.length - 1 - value.toInt();
                       if (index < 0 || index >= tempHistory.length) return const SizedBox();
                       final time = tempHistory[index].time;
                       return Padding(
@@ -89,10 +90,16 @@ class ScrollableBarChart extends ConsumerWidget {
                 ),
               ),
               barGroups: List.generate(maxX, (i) {
-                final temp = i < tempHistory.length ? tempHistory[i].value : 0.0;
-                final humidity = i < humidityHistory.length ? humidityHistory[i].value : 0.0;
+                // final temp = i < tempHistory.length ? tempHistory[i].value : 0.0;
+                // final humidity = i < humidityHistory.length ? humidityHistory[i].value : 0.0;
+                final tempIndex = tempHistory.length - 1 - i;
+                final humIndex = humidityHistory.length - 1 - i;
+
+                final temp = tempIndex >= 0 ? tempHistory[tempIndex].value : 0.0;
+                final humidity = humIndex >= 0 ? humidityHistory[humIndex].value : 0.0;
                 return BarChartGroupData(
                   x: i,
+                  // x: maxX - i - 1,
                   barsSpace: 4,
                   barRods: [
                     BarChartRodData(
