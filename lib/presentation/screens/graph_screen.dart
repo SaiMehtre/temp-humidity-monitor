@@ -1,7 +1,6 @@
 
   import 'package:flutter/material.dart';
   import 'package:flutter_riverpod/flutter_riverpod.dart';
-  import 'package:permission_handler/permission_handler.dart';
 
   import '../widgets/combined_chart.dart';
   import '../providers/temp_history_provider.dart';
@@ -41,16 +40,6 @@
             IconButton(
               icon: const Icon(Icons.download),
               onPressed: () async {
-
-                var status = await Permission.manageExternalStorage.request();
-
-                  if (!status.isGranted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Storage permission required")),
-                    );
-                    return;
-                  }
-
                 final choice = await showModalBottomSheet(
                   context: context,
                   builder: (context) {
