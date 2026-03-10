@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:excel/excel.dart';
-import 'package:path_provider/path_provider.dart';
+// import 'package:path_provider/path_provider.dart';
 import '../../data/models/sensor_point.dart';
 import 'package:intl/intl.dart';
 
@@ -21,8 +21,20 @@ class ExcelExporter {
       ]);
     }
 
-    final directory = await getApplicationDocumentsDirectory();
-    final path = "${directory.path}/sensor_data.xlsx";
+    // final directory = await getApplicationDocumentsDirectory();
+    // final path = "${directory.path}/sensor_data.xlsx";
+    // final directory = Directory('/storage/emulated/0/Download');
+    // final path = "${directory.path}/sensor_data.xlsx";
+
+    final directory = Directory('/storage/emulated/0/Download/temp_humidity');
+
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+
+      final path = "${directory.path}/sensor_data_$timestamp.xlsx";
 
     File(path)
       ..createSync(recursive: true)

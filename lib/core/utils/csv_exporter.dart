@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:csv/csv.dart';
-import 'package:path_provider/path_provider.dart';
+// import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/sensor_point.dart';
 
@@ -25,12 +25,17 @@ class CsvExporter {
 
     String csvData = const ListToCsvConverter().convert(rows);
 
-    final directory = await getExternalStorageDirectory();
+    // final directory = Directory('/storage/emulated/0/Download');
+    final directory = Directory('/storage/emulated/0/Download/temp_humidity');
 
-    final path = "${directory!.path}/sensor_data.csv";
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final path = "${directory.path}/sensor_report_$timestamp.CSV";
 
     final file = File(path);
-
     await file.writeAsString(csvData);
 
     return path;

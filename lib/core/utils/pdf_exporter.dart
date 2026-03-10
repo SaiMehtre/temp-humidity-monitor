@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
+// import 'package:path_provider/path_provider.dart';
 import '../../data/models/sensor_point.dart';
 
 class PdfExporter {
@@ -27,8 +27,18 @@ class PdfExporter {
       ),
     );
 
-    final directory = await getApplicationDocumentsDirectory();
-    final path = "${directory.path}/sensor_report.pdf";
+    // final directory = await getApplicationDocumentsDirectory();
+    // final path = "${directory.path}/sensor_report.pdf";
+    // final directory = Directory('/storage/emulated/0/Download');
+
+    final directory = Directory('/storage/emulated/0/Download/temp_humidity');
+
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final path = "${directory.path}/sensor_report_$timestamp.pdf";
 
     final file = File(path);
     await file.writeAsBytes(await pdf.save());
