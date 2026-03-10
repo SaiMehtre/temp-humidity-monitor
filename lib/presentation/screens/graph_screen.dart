@@ -6,6 +6,8 @@
   import '../providers/temp_history_provider.dart';
   import '../providers/humidity_history_provider.dart';
   import '../../core/utils/csv_exporter.dart';
+  import '../../core/utils/excel_exporter.dart';
+  import '../../core/utils/pdf_exporter.dart';
 
   class GraphScreen extends ConsumerWidget {
     GraphScreen({super.key});
@@ -22,19 +24,72 @@
           title: const Text("Sensor History"),
           actions: [
             // CSV EXPORT
+            // IconButton(
+            //   icon: const Icon(Icons.download),
+            //   onPressed: () async {
+            //     final temp = ref.read(temperatureHistoryProvider);
+            //     final humidity = ref.read(humidityHistoryProvider);
+
+            //     final path = await CsvExporter.export(temp, humidity);
+
+            //     ScaffoldMessenger.of(context).showSnackBar(
+            //       SnackBar(content: Text("CSV saved at $path"),duration: const Duration(seconds: 4),),
+            //     );
+            //   },
+            // ),
             IconButton(
               icon: const Icon(Icons.download),
               onPressed: () async {
+
+                final choice = await showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return SafeArea(
+                      child: Wrap(
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.table_chart),
+                            title: const Text("Export Excel"),
+                            onTap: () => Navigator.pop(context, "excel"),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.picture_as_pdf),
+                            title: const Text("Export PDF"),
+                            onTap: () => Navigator.pop(context, "pdf"),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.grid_on),
+                            title: const Text("Export CSV"),
+                            onTap: () => Navigator.pop(context, "csv"),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+
                 final temp = ref.read(temperatureHistoryProvider);
                 final humidity = ref.read(humidityHistoryProvider);
 
-                final path = await CsvExporter.export(temp, humidity);
+                String? path;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("CSV saved at $path"),duration: const Duration(seconds: 4),),
-                );
+                if (choice == "excel") {
+                  path = await ExcelExporter.export(temp, humidity);
+                } 
+                else if (choice == "pdf") {
+                  path = await PdfExporter.export(temp, humidity);
+                } 
+                else if (choice == "csv") {
+                  path = await CsvExporter.export(temp, humidity);
+                }
+
+                if (path != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("File saved at $path")),
+                  );
+                }
               },
-            ),
+            )
           ],
         ),
         body: Padding(
@@ -54,16 +109,13 @@
 
                   const SizedBox(height: 10),
 
-                  // LEGEND
-                  Row(
-                    children: [
-                      Container(width: 12, height: 12, color: Colors.red),
-                      const SizedBox(width: 4),
-                      const Text("Temperature"),
-                      const SizedBox(width: 20),
-                      Container(width: 12, height: 12, color: Colors.blue),
-                      const SizedBox(width: 4),
-                      const Text("Humidity"),
+                  
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 8,
+                    children:  [
+                      _LegendItem(color: Colors.red, label: "Temperature"),
+                      _LegendItem(color: Colors.blue, label: "Humidity"),
                     ],
                   ),
 
@@ -85,6 +137,30 @@
             ),
           ),
         ),
+      );
+    }
+  }
+
+  class _LegendItem extends StatelessWidget {
+    final Color color;
+    final String label;
+
+    const _LegendItem({required this.color, required this.label});
+
+    @override
+    Widget build(BuildContext context) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 12, height: 12, color: color),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       );
     }
   }

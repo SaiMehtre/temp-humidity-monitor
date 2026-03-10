@@ -16,7 +16,7 @@ class ScrollableBarChart extends ConsumerWidget {
 
     if (tempHistory.isEmpty && humidityHistory.isEmpty) {
       return const SizedBox(
-        height: 340,
+        height: 300,
         child: Center(child: Text("No Data")),
       );
     }

@@ -71,7 +71,7 @@ void initState() {
 
       final alert = AlertHistory("Temperature", next.temperature, now);
 
-      box.add(alert); // 🔥 database save
+      box.add(alert); //  database save
 
       ref.read(alertHistoryProvider.notifier).update((state) => [
         ...state,
@@ -92,12 +92,12 @@ void initState() {
         "Humidity: ${next.humidity}%",
       );
 
-      // ✅ Save humidity alert to Hive (this was missing)
+      //  Save humidity alert to Hive (this was missing)
       final box = Hive.box('alerts');
       final alert = AlertHistory("Humidity", next.humidity, now);
       box.add(alert);
 
-      // ✅ Update Riverpod state
+      //  Update Riverpod state
       ref.read(alertHistoryProvider.notifier).update((state) => [
             ...state,
             alert
@@ -111,12 +111,6 @@ void initState() {
     if (!isTempDanger && !isHumidityDanger) {
       AlertService.stopAlert();
     }
-
-    // ref.read(temperatureHistoryProvider.notifier).update((state) {
-    //   final updated = [...state, next.temperature];
-    //   if (updated.length > 20) updated.removeAt(0);
-    //   return updated;
-    // });
   });
 }
 
@@ -199,18 +193,6 @@ void initState() {
 
               const SizedBox(height: 20),
               
-              // DropdownButton<int>(
-              //   value: ref.watch(intervalProvider),
-              //   items: const [
-              //     DropdownMenuItem(value: 10, child: Text("10 Seconds")),
-              //     DropdownMenuItem(value: 60, child: Text("1 Minute")),
-              //     DropdownMenuItem(value: 300, child: Text("5 Minutes")),
-              //   ],
-              //   onChanged: (value) {
-              //     ref.read(intervalProvider.notifier).state = value!;
-              //     ref.read(dashboardProvider.notifier).refreshData();
-              //   },
-              // ),
               DropdownButton<int>(
                 value: [10,60,300].contains(ref.watch(intervalProvider))
                     ? ref.watch(intervalProvider)

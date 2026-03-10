@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../data/models/sensor_point.dart';
+import 'package:intl/intl.dart';
 
 class ExcelExporter {
   static Future<String> export(
@@ -14,7 +15,7 @@ class ExcelExporter {
 
     for (int i = 0; i < temp.length; i++) {
       sheet.appendRow([
-        temp[i].time.toIso8601String(),
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(temp[i].time.toLocal()),
         temp[i].value,
         humidity.length > i ? humidity[i].value : ""
       ]);
