@@ -154,31 +154,28 @@ class _SensorCardState extends State<SensorCard>
                 const SizedBox(height: 16),
 
                 /// SENSOR CONTENT
-                /// SENSOR CONTENT
-                /// SENSOR CONTENT
-/// SENSOR CONTENT
-if (widget.title == "Temperature")
-  IndustrialThermometer(
-    temperature: getTemperature(),
-    alertType: widget.alertType,
-  )
-else if (widget.title == "Humidity")
-  HumidityGauge(
-    humidity: getHumidity(),
-    alertType: widget.alertType,
-  )
-else
-  AnimatedSwitcher(
-    duration: const Duration(milliseconds: 500),
-    child: Text(
-      widget.value,
-      key: ValueKey(widget.value),
-      style: const TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ),
+                if (widget.title == "Temperature")
+                  IndustrialThermometer(
+                    temperature: getTemperature(),
+                    alertType: widget.alertType,
+                  )
+                else if (widget.title == "Humidity")
+                  HumidityGauge(
+                    humidity: getHumidity(),
+                    alertType: widget.alertType,
+                  )
+                else
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    child: Text(
+                      widget.value,
+                      key: ValueKey(widget.value),
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
 
                 const SizedBox(height: 20),
 

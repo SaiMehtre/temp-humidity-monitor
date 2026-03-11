@@ -19,7 +19,7 @@ class DashboardNotifier extends StateNotifier<SensorData> {
   DashboardNotifier(this.ref) : super(MockSensorData.getData()) {
     _startAutoUpdate();
 
-    // 🔥 IMPORTANT: interval change listener
+    // IMPORTANT: interval change listener
     ref.listen<int>(intervalProvider, (_, __) {
       _startAutoUpdate(); // restart timer
     });
@@ -34,14 +34,14 @@ class DashboardNotifier extends StateNotifier<SensorData> {
     final newData = MockSensorData.getData();
     state = newData;
 
-    // // ✅ Temperature history
+    // // Temperature history
     // ref.read(temperatureHistoryProvider.notifier).update((prev) {
     //   final updated = [...prev, newData.temperature];
     //   if (updated.length > 20) updated.removeAt(0);
     //   return updated;
     // });
 
-    // // ✅ Humidity history
+    // // Humidity history
     // ref.read(humidityHistoryProvider.notifier).update((prev) {
     //   final updated = [...prev, newData.humidity];
     //   if (updated.length > 20) updated.removeAt(0);
@@ -50,14 +50,14 @@ class DashboardNotifier extends StateNotifier<SensorData> {
 
     final now = DateTime.now();
 
-    // ✅ Temperature history
+    // Temperature history
     ref.read(temperatureHistoryProvider.notifier).update((prev) {
       final updated = [...prev, SensorPoint(newData.temperature, now)];
       if (updated.length > 20) updated.removeAt(0);
       return updated;
     });
 
-    // ✅ Humidity history
+    // Humidity history
     ref.read(humidityHistoryProvider.notifier).update((prev) {
       final updated = [...prev, SensorPoint(newData.humidity, now)];
       if (updated.length > 20) updated.removeAt(0);
@@ -75,14 +75,14 @@ class DashboardNotifier extends StateNotifier<SensorData> {
 
     state = newData;
 
-    // ✅ Temperature
+    // Temperature
     ref.read(temperatureHistoryProvider.notifier).update((prev) {
       final updated = [...prev, SensorPoint(newData.temperature, now)];
       if (updated.length > 50) updated.removeAt(0);
       return updated;
     });
 
-    // ✅ Humidity
+    // Humidity
     ref.read(humidityHistoryProvider.notifier).update((prev) {
       final updated = [...prev, SensorPoint(newData.humidity, now)];
       if (updated.length > 50) updated.removeAt(0);

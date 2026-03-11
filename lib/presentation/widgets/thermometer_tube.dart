@@ -11,18 +11,6 @@ class IndustrialThermometer extends StatelessWidget {
     required this.alertType,
   });
 
-  // double normalize() {
-  //   const min = -20;
-  //   const max = 100;
-
-  //   double value = (temperature - min) / (max - min);
-
-  //   if (value < 0) value = 0;
-  //   if (value > 1) value = 1;
-
-  //   return value;
-  // }
-
   double normalize() {
   const min = 0;
   const max = 100;
@@ -58,61 +46,58 @@ class IndustrialThermometer extends StatelessWidget {
         alignment: Alignment.center,
         children: [
 
-          /// SCALE MARKS
-          /// SCALE MARKS + NUMBERS
-          /// SCALE MARKS + NUMBERS (RIGHT SIDE)
           /// SCALE MARKS + NUMBERS (CENTERED WITH TUBE)
           Positioned(
-          left: 15,
-          top: 30,
-          bottom: 30,
-          child: SizedBox(
-            width: 180, // full thermometer width
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(11, (i) {
-                int value = (10 - i) * 10;
+            left: 15,
+            top: 30,
+            bottom: 30,
+            child: SizedBox(
+              width: 180, // full thermometer width
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(11, (i) {
+                  int value = (10 - i) * 10;
 
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    /// LEFT TICK
-                    Container(
-                      width: 20,
-                      height: 2,
-                      color: Colors.black45,
-                    ),
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      /// LEFT TICK
+                      Container(
+                        width: 20,
+                        height: 2,
+                        color: Colors.black45,
+                      ),
 
-                    /// GAP FOR TUBE CENTER
-                    SizedBox(width: 70),
+                      /// GAP FOR TUBE CENTER
+                      SizedBox(width: 70),
 
-                    /// RIGHT SIDE (tick + number)
-                    Row(
-                      children: [
-                        Container(
-                          width: 20,
-                          height: 2,
-                          color: Colors.black45,
-                        ),
-                        const SizedBox(width: 6),
-                        SizedBox(
-                          width: 28,
-                          child: Text(
-                            "$value",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                      /// RIGHT SIDE (tick + number)
+                      Row(
+                        children: [
+                          Container(
+                            width: 20,
+                            height: 2,
+                            color: Colors.black45,
+                          ),
+                          const SizedBox(width: 6),
+                          SizedBox(
+                            width: 28,
+                            child: Text(
+                              "$value",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              }),
+                        ],
+                      ),
+                    ],
+                  );
+                }),
+              ),
             ),
           ),
-        ),
           /// GLASS TUBE
           Center(
             child: Container(

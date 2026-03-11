@@ -36,7 +36,7 @@
 //                 (index) => FlSpot(index.toDouble(), data[index]),
 //               ),
 //               isCurved: true,
-//               dotData: FlDotData(show: true), // 🔥 dots visible karo
+//               dotData: FlDotData(show: true), // dots visible karo
 //               barWidth: 3,
 //             ),
 //           ],          
